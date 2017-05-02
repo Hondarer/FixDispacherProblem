@@ -10,7 +10,7 @@ namespace FixDispacherProblem
     /// <summary>
     /// <see cref="Dispatcher"/> の支援機能を提供します。
     /// </summary>
-    public class DispatherHelper
+    public class DispatcherHelper
     {
         /// <summary>
         /// バックグラウンドスレッドにて、引数に与えられた <see cref="Action"/> を実行します。
@@ -110,7 +110,7 @@ namespace FixDispacherProblem
                             img.Source = null;
                         }));
 
-                        DispatherHelper.InvokeBackground(() =>
+                        DispatcherHelper.InvokeBackground(() =>
                         {
                             BitmapDecoder decoder = BitmapDecoder.Create(new Uri(path), createOption, cacheOption);
                             BitmapSource bmp = new WriteableBitmap(decoder.Frames[0]);
