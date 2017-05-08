@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -115,21 +116,47 @@ namespace FixDispacherProblem
                             BitmapDecoder decoder = BitmapDecoder.Create(new Uri(path), createOption, cacheOption);
                             BitmapSource bmp = new WriteableBitmap(decoder.Frames[0]);
                             bmp.Freeze();
-                            Dispatcher.Invoke(new Action(() =>
+
+                            // バックグラウンドから、UI スレッドの Dispatcher の呼び出しを待ち合わせている間に
+                            // アプリケーションの終了を行おうとすると、
+                            // System.Threading.Tasks.TaskCanceledException が発生する。
+                            // この例外は、ユーザーコードでキャッチすべき。
+                            try
                             {
-                                img.Source = bmp;
-                            }));
+                                Dispatcher.Invoke(new Action(() =>
+                                {
+                                    img.Source = bmp;
+                                }));
+                            }
+                            catch (TaskCanceledException ex)
+                            {
+                                // 構造上、プロセス終了のタイミングでしか通過しない。
+                                Debug.WriteLine(string.Format("Dispatcher への依頼待ち合わせ中に、プロセスが終了しました:\r\n{0}", ex.ToString()));
+                            }
                         });
 
-                        //DispatherHelper.BeginInvokeBackground(() => 
+                        //DispatcherHelper.BeginInvokeBackground(() =>
                         //{
                         //    BitmapDecoder decoder = BitmapDecoder.Create(new Uri(path), createOption, cacheOption);
                         //    BitmapSource bmp = new WriteableBitmap(decoder.Frames[0]);
                         //    bmp.Freeze();
-                        //    Dispatcher.Invoke(new Action(() =>
+
+                        //    // バックグラウンドから、UI スレッドの Dispatcher の呼び出しを待ち合わせている間に
+                        //    // アプリケーションの終了を行おうとすると、
+                        //    // System.Threading.Tasks.TaskCanceledException が発生する。
+                        //    // この例外は、ユーザーコードでキャッチすべき。
+                        //    try
                         //    {
-                        //        img.Source = bmp;
-                        //    }));
+                        //        Dispatcher.Invoke(new Action(() =>
+                        //        {
+                        //            img.Source = bmp;
+                        //        }));
+                        //    }
+                        //    catch (TaskCanceledException ex)
+                        //    {
+                        //        // 構造上、プロセス終了のタイミングでしか通過しない。
+                        //        Debug.WriteLine(string.Format("Dispatcher への依頼待ち合わせ中に、プロセスが終了しました:\r\n{0}", ex.ToString()));
+                        //    }
                         //}).GetAwaiter().GetResult();
 
                         Thread.Sleep(100);
