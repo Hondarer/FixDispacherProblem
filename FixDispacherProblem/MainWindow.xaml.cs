@@ -117,8 +117,8 @@ namespace FixDispacherProblem
                             BitmapSource bmp = new WriteableBitmap(decoder.Frames[0]);
                             bmp.Freeze();
 
-                            // バックグラウンドから、UI スレッドの Dispatcher の呼び出しを待ち合わせている間に
-                            // アプリケーションの終了を行おうとすると、
+                            // バックグラウンドから、UI スレッドの Dispatcher の Invoke を待ち合わせている間に
+                            // アプリケーションの終了を行うと、
                             // System.Threading.Tasks.TaskCanceledException が発生する。
                             // この例外は、ユーザーコードでキャッチすべき。
                             try
@@ -130,8 +130,8 @@ namespace FixDispacherProblem
                             }
                             catch (TaskCanceledException ex)
                             {
-                                // 構造上、プロセス終了のタイミングでしか通過しない。
-                                Debug.WriteLine(string.Format("Dispatcher への依頼待ち合わせ中に、プロセスが終了しました:\r\n{0}", ex.ToString()));
+                                // Dispatcher への Invoke 待機中に、キャンセルされた。
+                                Debug.WriteLine(string.Format("Dispatcher への Invoke 待機中に、Dispatcher が終了しました:\r\n{0}", ex.ToString()));
                             }
                         });
 
@@ -141,8 +141,8 @@ namespace FixDispacherProblem
                         //    BitmapSource bmp = new WriteableBitmap(decoder.Frames[0]);
                         //    bmp.Freeze();
 
-                        //    // バックグラウンドから、UI スレッドの Dispatcher の呼び出しを待ち合わせている間に
-                        //    // アプリケーションの終了を行おうとすると、
+                        //    // バックグラウンドから、UI スレッドの Dispatcher の Invoke を待ち合わせている間に
+                        //    // アプリケーションの終了を行うと、
                         //    // System.Threading.Tasks.TaskCanceledException が発生する。
                         //    // この例外は、ユーザーコードでキャッチすべき。
                         //    try
@@ -154,8 +154,8 @@ namespace FixDispacherProblem
                         //    }
                         //    catch (TaskCanceledException ex)
                         //    {
-                        //        // 構造上、プロセス終了のタイミングでしか通過しない。
-                        //        Debug.WriteLine(string.Format("Dispatcher への依頼待ち合わせ中に、プロセスが終了しました:\r\n{0}", ex.ToString()));
+                        //        // Dispatcher への Invoke 待機中に、キャンセルされた。
+                        //        Debug.WriteLine(string.Format("Dispatcher への Invoke 待機中に、Dispatcher が終了しました:\r\n{0}", ex.ToString()));
                         //    }
                         //}).GetAwaiter().GetResult();
 
